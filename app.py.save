@@ -1,0 +1,30 @@
+∑∑import os
+from flask import Flask, request, jsonify
+import openai
+
+app = Flask(__name__)
+
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+@app.route("/")
+def home():
+    return 'Hola desde BPS E-TRUCK IA 🤖📞'
+
+@app.route("/gpt", methods=["POST"])
+def gpt_respond():
+    data = request.json
+    prompt = data.get("prompt", "")
+
+    if not prompt:
+        return jsonify({"error": "No prompt provided"}), 400
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "Eres un asistente experto en vehículos eléctricos de última milla en México."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return jsonify(response["choices"][0]["message"])
+
