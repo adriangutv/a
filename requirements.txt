@@ -1,2 +1,6 @@
 Flask==2.2.5
-openai==1.30.3
+openai
+twilio
+elevenlabs
+python-dotenv
+requests
