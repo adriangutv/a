@@ -1,5 +1,2 @@
+flask
 Flask
-requests
-openai
-twilio
-python-dotenv
