@@ -84,6 +84,6 @@ def manejar_mensaje():
 
     return jsonify({"respuesta": "Gracias por tu mensaje, lo estoy revisando y te daré seguimiento."})
 
-# 🏁 Ejecutar en local
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
