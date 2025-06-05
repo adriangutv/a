@@ -6,12 +6,12 @@ import os
 
 app = Flask(__name__)
 
-# ✅ Endpoint de prueba para verificar funcionamiento general
+# ✅ Endpoint de prueba
 @app.route("/", methods=["GET"])
 def home():
     return "✅ BPS E-TRUCK IA está en línea"
 
-# 🎧 Endpoint para Twilio: reproducir la última respuesta generada en voz
+# 🎧 Para Twilio: reproduce la última voz generada
 @app.route("/twiml-bps", methods=["GET", "POST"])
 def twiml_bps():
     twiml = f"""
@@ -21,7 +21,7 @@ def twiml_bps():
     """
     return Response(twiml, mimetype="text/xml")
 
-# 🧠 Ruta para generar respuesta IA + voz desde texto
+# 🧠 Prueba de conversación + audio
 @app.route("/probar-llamada", methods=["GET"])
 def probar_llamada():
     texto_usuario = request.args.get("mensaje", "")
@@ -39,7 +39,7 @@ def probar_llamada():
         "voz_url": f"{os.getenv('DOMAIN_URL')}/static/voz_llamada.mp3"
     })
 
-# 📆 Endpoint para agendar una reunión por Google Meet manualmente
+# 📆 Agendar reunión manual
 @app.route("/agendar-reunion", methods=["POST"])
 def agendar_reunion():
     data = request.json
@@ -59,7 +59,7 @@ def agendar_reunion():
         "fecha": resultado["start"]
     })
 
-# 🧠 Endpoint para detectar intención del mensaje y agendar si aplica
+# 💬 Análisis de mensaje para agendar si aplica
 @app.route("/mensaje", methods=["POST"])
 def manejar_mensaje():
     data = request.json
@@ -84,8 +84,7 @@ def manejar_mensaje():
 
     return jsonify({"respuesta": "Gracias por tu mensaje, lo estoy revisando y te daré seguimiento."})
 
-import os
-
+# 🏁 Ejecutar en Railway
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
