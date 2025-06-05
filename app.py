@@ -1,8 +1,8 @@
-import os
 from flask import Flask, request, jsonify, Response
 from utils.conversacion import generar_respuesta, analizar_intencion
 from utils.elevenlabs import texto_a_audio
 from utils.calendar import agendar_google_meet
+import os
 
 app = Flask(__name__)
 
@@ -85,5 +85,6 @@ def manejar_mensaje():
     return jsonify({"respuesta": "Gracias por tu mensaje, lo estoy revisando y te daré seguimiento."})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    from waitress import serve
+    serve(app, host="0.0.0.0", port=8000)
 
