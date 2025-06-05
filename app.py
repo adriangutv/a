@@ -1,8 +1,8 @@
+import os
 from flask import Flask, request, jsonify, Response
 from utils.conversacion import generar_respuesta, analizar_intencion
 from utils.elevenlabs import texto_a_audio
 from utils.calendar import agendar_google_meet
-import os
 
 app = Flask(__name__)
 
