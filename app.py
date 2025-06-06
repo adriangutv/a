@@ -3,6 +3,7 @@ from flask_cors import CORS
 from utils.conversacion import generar_respuesta, analizar_intencion
 from utils.elevenlabs import texto_a_audio
 from utils.calendar import agendar_google_meet
+from utils.twilio_client import llamar_a_usuario
 import os
 
 app = Flask(__name__)
@@ -39,6 +40,12 @@ def probar_llamada():
     if not guardado:
         return jsonify({"error": "No se pudo generar la voz"}), 500
 
+    # 🚨 Aquí es donde se lanza la llamada real
+    llamada = llamar_a_usuario(telefono)
+
+    if not llamada:
+        return jsonify({"error": "No se pudo iniciar la llamada"}), 500
+
     return jsonify({
         "respuesta": respuesta_ia,
         "voz_url": f"{os.getenv('DOMAIN_URL')}/static/voz_llamada.mp3",
@@ -65,7 +72,7 @@ def agendar_reunion():
         "fecha": resultado["start"]
     })
 
-# 💬 Analiza mensaje y agenda si aplica
+# 💬 Análisis de mensaje y agendado si aplica
 @app.route("/mensaje", methods=["POST"])
 def manejar_mensaje():
     data = request.get_json()
