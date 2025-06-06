@@ -1,17 +1,19 @@
 from flask import Flask, request, jsonify, Response
+from flask_cors import CORS
 from utils.conversacion import generar_respuesta, analizar_intencion
 from utils.elevenlabs import texto_a_audio
 from utils.calendar import agendar_google_meet
 import os
 
 app = Flask(__name__)
+CORS(app)  # Habilita CORS para todas las rutas
 
-# ✅ Endpoint de prueba
+# ✅ Endpoint base de verificación
 @app.route("/", methods=["GET"])
 def home():
     return "✅ BPS E-TRUCK IA está en línea"
 
-# 🎧 Para Twilio: reproduce la última voz generada
+# 🎧 Endpoint para Twilio: reproduce el audio generado
 @app.route("/twiml-bps", methods=["GET", "POST"])
 def twiml_bps():
     twiml = f"""
@@ -21,10 +23,13 @@ def twiml_bps():
     """
     return Response(twiml, mimetype="text/xml")
 
-# 🧠 Prueba de conversación + audio
-@app.route("/probar-llamada", methods=["GET"])
+# 🧠 Genera respuesta y voz con ElevenLabs (modo prueba manual)
+@app.route("/probar-llamada", methods=["POST"])
 def probar_llamada():
-    texto_usuario = request.args.get("mensaje", "")
+    data = request.get_json()
+    texto_usuario = data.get("mensaje_usuario")
+    telefono = data.get("telefono")
+
     if not texto_usuario:
         return jsonify({"error": "Falta el mensaje del usuario"}), 400
 
@@ -36,13 +41,14 @@ def probar_llamada():
 
     return jsonify({
         "respuesta": respuesta_ia,
-        "voz_url": f"{os.getenv('DOMAIN_URL')}/static/voz_llamada.mp3"
+        "voz_url": f"{os.getenv('DOMAIN_URL')}/static/voz_llamada.mp3",
+        "telefono": telefono
     })
 
-# 📆 Agendar reunión manual
+# 📆 Agendar reunión directamente
 @app.route("/agendar-reunion", methods=["POST"])
 def agendar_reunion():
-    data = request.json
+    data = request.get_json()
     nombre = data.get("nombre")
     correo = data.get("correo")
     fecha_iso = data.get("fecha_iso")
@@ -59,10 +65,10 @@ def agendar_reunion():
         "fecha": resultado["start"]
     })
 
-# 💬 Análisis de mensaje para agendar si aplica
+# 💬 Analiza mensaje y agenda si aplica
 @app.route("/mensaje", methods=["POST"])
 def manejar_mensaje():
-    data = request.json
+    data = request.get_json()
     mensaje = data.get("mensaje")
     nombre = data.get("nombre")
     correo = data.get("correo")
